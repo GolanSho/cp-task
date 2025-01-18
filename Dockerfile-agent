@@ -1,0 +1,9 @@
+FROM odavid/jenkins-jnlp-slave:3071.v7e9b_0dc08466-1-39-debian
+
+RUN apt update && apt install unzip -y
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
+
+CMD ["sleep", "9999999"]
