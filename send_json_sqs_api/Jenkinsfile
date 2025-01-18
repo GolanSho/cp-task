@@ -28,7 +28,6 @@ node ('Docker') {
     String currDate = current_timestamp().toString()
     withAWS(credentials: 'aws-creds'){
       withDockerRegistry([url: "https://${ECRegistry}/${repository}"]) {
-        displayMessage("Push Image")
         def login = ecrLogin()
         sh login
         dockerImage.push("${version}")
@@ -39,18 +38,10 @@ node ('Docker') {
 
   
   stage ('Deploy on ECS')
-    displayMessage("Deploy on ECS")
     withAWS(region: "${aws_region}", credentials: 'aws-creds') {
  	    sh "aws ecs update-service --region ${aws_region} --cluster ${ecs_cluster} --service ${ecs_service} --force-new-deployment"
 	  }
   }
-
-
-def displayMessage(message) {
-    ansiColor('xterm') {
-        echo "\033[44m  ${message} \033[0m"
-    }
-}
 
 
 def current_timestamp() {
