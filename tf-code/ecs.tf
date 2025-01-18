@@ -30,13 +30,13 @@ resource "aws_autoscaling_group" "ecs-cluster" {
                         id = aws_launch_template.ecs.id
                         version = "$Latest"
                 }
-    vpc_zone_identifier  = [aws_subnet.public[0].id]
+    vpc_zone_identifier  = [data.aws_subnets.public.id]
     tag{
         key = "Name"
         value = "cp-task-ecs-ltstance"
         propagate_at_launch = true
     }
-  depends_on      = [aws_launch_template.ecs, aws_subnet.public]
+  depends_on      = [aws_launch_template.ecs, data.aws_subnets.public]
 }
 
 resource "aws_ecs_capacity_provider" "ec2_provider" {

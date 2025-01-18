@@ -1,33 +1,64 @@
 
 import boto3
+import time
+import tempfile
+from datetime import datetime
 
+def pushMsgToS3(msg):
+    """ Push the received message to S3 Bucket """
 
-def validateToken(reqToken):
-    """ Validate the request token using token from ssm """
+    s3 = boto3.client('s3', region_name="us-east-1")
+    tmp = tempfile.NamedTemporaryFile()
 
-    ssm = boto3.client('ssm', region_name="us-east-1")
+    with open(tmp.name, 'w') as f:
+        f.write(msg)
+        
+    now = datetime.now()
+    timeForMsg = now.strftime("%d-%m-%Y-%H-%M")
 
-    ssmParam = ssm.get_parameter(Name='cp-ssm-req-token', WithDecryption=True)
-    token = ssmParam['Parameter']['Value']
+    try:
+        s3.upload_file(Filename=f"{tmp.name}", Bucket='cp-task-s3-bucket',
+        Key=f'message-{timeForMsg}')
+        print('Message Pushed to bucket.')
+    except Exception as e:
+        print(e)
+    
 
-    if token == reqToken:
-        return True
-    else:
-        return False
-
-def sendDataToSQS(data):
-    """ Send the request data to SQS """
+def recDataFromSQS():
+    """ Receive Message from SQS """
     queue_url = 'https://sqs.us-east-1.amazonaws.com/329599656414/cp-task-sqs'
 
     sqs = boto3.client('sqs', region_name="us-east-1")
 
-    response = sqs.send_message(
+    response = sqs.receive_message(
         QueueUrl=queue_url,
-        DelaySeconds=10,
-        MessageBody=(f'{data}')
+        MaxNumberOfMessages=1,
+        VisibilityTimeout=0,
+        WaitTimeSeconds=0
     )
+    
+    if 'Messages' in response:
+        message = response['Messages'][0]['Body']
+        receipt_handle = response['Messages'][0]['ReceiptHandle']
 
-    return response
+        sqs.delete_message(
+            QueueUrl=queue_url,
+            ReceiptHandle=receipt_handle
+        )
+
+        return message
+    else:
+        return False
 
 if __name__ == '__main__':
-    
+    while True:
+        msgToPush = recDataFromSQS()
+        
+        if msgToPush != False:
+            print(msgToPush)
+            pushMsgToS3(msgToPush)
+        else:
+            print('No Messages to pull')
+
+        time.sleep(20)
+

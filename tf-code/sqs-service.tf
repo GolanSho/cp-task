@@ -12,7 +12,7 @@ resource "aws_ecs_task_definition" "sqs-task" {
   container_definitions = jsonencode([
     {
       name      = "cp-task-ecs-sqs-td"
-      image     = "${aws_ecr_repository.sqs-image.repository_url}:0.1"
+      image     = "${aws_ecr_repository.sqs-image.repository_url}:latest"
       cpu       = 10
       memory    = 512
       essential = true
@@ -37,5 +37,5 @@ resource "aws_ecs_service" "sqs-service" {
     container_name   = "cp-task-send-sqs-container"
     container_port   = 5000
   }
-  depends_on      = [aws_ecs_cluster.cluster, aws_ecs_task_definition.task, aws_lb_target_group.svc-tg, aws_lb.nlb]
+  depends_on      = [aws_ecs_cluster.cluster, aws_ecs_task_definition.sqs-task, aws_lb_target_group.svc-tg, aws_lb.nlb]
 }

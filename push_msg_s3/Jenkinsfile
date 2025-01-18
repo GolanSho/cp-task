@@ -33,20 +33,12 @@ node('Docker') {
   }
 
   
-  stage ('Deploy on ECS')
-    displayMessage("Deploy on ECS")
+  stage ('Deploy on ECS') {
     withAWS(region: "${aws_region}") {
  	    sh "aws ecs update-service --region ${aws_region} --cluster ${ecs_cluster} --service ${ecs_service} --force-new-deployment"
 	  }
   }
-
-
-def displayMessage(message) {
-    ansiColor('xterm') {
-        echo "\033[44m  ${message} \033[0m"
-    }
 }
-
 
 def current_timestamp() {
    def date = new Date()

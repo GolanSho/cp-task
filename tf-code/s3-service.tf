@@ -37,5 +37,5 @@ resource "aws_ecs_service" "s3-service" {
     container_name   = "cp-task-push-s3-container"
     container_port   = 5000
   }
-  depends_on      = [aws_ecs_cluster.cluster, aws_ecs_task_definition.task, aws_lb_target_group.svc-tg, aws_lb.nlb]
+  depends_on      = [aws_ecs_cluster.cluster, aws_ecs_task_definition.s3-task, aws_lb_target_group.svc-tg, aws_lb.nlb]
 }
