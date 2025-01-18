@@ -1,0 +1,59 @@
+import java.time.*
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+
+node {
+
+   def now = LocalDateTime.now()
+   def ECRegistry = "329599656414.dkr.ecr.us-east-1.amazonaws.com"
+   def repository = "cp-task-send-sqs-image"
+   def aws_region = "us-east-1"
+   def ecs_cluster = "cp-task-ecs-cluster"
+   def ecs_task = "cp-task-ecs-td"
+   def ecs_service = "cp-task-send-sqs-service" 
+   def version = params.version
+
+ 
+  stage('Checkout SCM') {
+  	checkout scm
+  }
+
+  stage('Building image') {
+	  script {
+      dockerImage = docker.build("${ECRegistry}/${repository}:${version}")
+	  }
+  }
+
+  stage('Push image') {
+    String currDate = current_timestamp().toString()
+		withDockerRegistry([url: "https://${ECRegistry}/${repository}"]) {
+      displayMessage("Push Image")
+			def login = ecrLogin()
+      sh login
+      dockerImage.push("${version}")
+      dockerImage.push(currDate)
+		}
+  }
+
+  
+  stage ('Deploy on ECS')
+    displayMessage("Deploy on ECS")
+    withAWS(region: "${aws_region}") {
+ 	    sh "aws ecs update-service --region ${aws_region} --cluster ${ecs_cluster} --service ${ecs_service} --force-new-deployment"
+	  }
+  }
+
+
+def displayMessage(message) {
+    ansiColor('xterm') {
+        echo "\033[44m  ${message} \033[0m"
+    }
+}
+
+
+def current_timestamp() {
+   def date = new Date()
+   currDate = new SimpleDateFormat("ddMMyyyyHHmm")
+   out = currDate.format(date)
+   return out
+}
