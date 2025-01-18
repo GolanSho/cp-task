@@ -27,12 +27,13 @@ node ('Docker') {
   stage('Push image') {
     String currDate = current_timestamp().toString()
     withAWS(credentials: 'aws-creds'){
-      withDockerRegistry([url: "https://${ECRegistry}/${repository}"]) {
+    //  withDockerRegistry([url: "https://${ECRegistry}/${repository}"]) {
         def login = ecrLogin()
         sh login
-        dockerImage.push("${version}")
-        dockerImage.push(currDate)
-      }
+        sh "docker push ${ECRegistry}/${repository}:${version}"
+      //  dockerImage.push("${version}")
+      //  dockerImage.push(currDate)
+    //  }
     }
   }
 
