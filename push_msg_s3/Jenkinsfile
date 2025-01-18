@@ -20,7 +20,7 @@ node('Docker') {
 
   stage('Building image') {
 	  script {
-      dockerImage = docker.build("${ECRegistry}/${repository}:${version}")
+      dockerImage = docker.build("${ECRegistry}/${repository}:${version}", "-f push_msg_s3/Dockerfile push_msg_s3")
 	  }
   }
 
