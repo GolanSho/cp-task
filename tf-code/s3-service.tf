@@ -11,10 +11,10 @@ resource "aws_ecs_task_definition" "s3-task" {
   family = "cp-task-ecs-s3-td"
   container_definitions = jsonencode([
     {
-      name      = "cp-task-ecs-s3-td"
+      name      = "cp-task-push-s3-container"
       image     = "${aws_ecr_repository.s3-image.repository_url}:latest"
-      cpu       = 10
-      memory    = 512
+      cpu       = 5
+      memory    = 264
       essential = true
       portMappings = [
         {
@@ -24,6 +24,8 @@ resource "aws_ecs_task_definition" "s3-task" {
       ]
     }
   ])
+  execution_role_arn = "arn:aws:iam::329599656414:role/ecsTaskExecutionRole"
+
   depends_on      = [aws_ecr_repository.s3-image]
 }
 
@@ -32,10 +34,6 @@ resource "aws_ecs_service" "s3-service" {
   cluster         = aws_ecs_cluster.cluster.id
   task_definition = aws_ecs_task_definition.s3-task.arn
   desired_count   = 1
-  load_balancer {
-    target_group_arn = aws_lb_target_group.svc-tg.arn
-    container_name   = "cp-task-push-s3-container"
-    container_port   = 5000
-  }
-  depends_on      = [aws_ecs_cluster.cluster, aws_ecs_task_definition.s3-task, aws_lb_target_group.svc-tg, aws_lb.nlb]
+  
+  depends_on      = [aws_ecs_cluster.cluster, aws_ecs_task_definition.s3-task]
 }

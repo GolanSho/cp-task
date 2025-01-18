@@ -11,10 +11,10 @@ resource "aws_ecs_task_definition" "sqs-task" {
   family = "cp-task-ecs-sqs-td"
   container_definitions = jsonencode([
     {
-      name      = "cp-task-ecs-sqs-td"
+      name      = "cp-task-send-sqs-container"
       image     = "${aws_ecr_repository.sqs-image.repository_url}:latest"
-      cpu       = 10
-      memory    = 512
+      cpu       = 5
+      memory    = 264
       essential = true
       portMappings = [
         {
@@ -24,6 +24,9 @@ resource "aws_ecs_task_definition" "sqs-task" {
       ]
     }
   ])
+  execution_role_arn = "arn:aws:iam::329599656414:role/ecsTaskExecutionRole" #aws_iam_role.ecs-execution-role.arn
+  #task_role_arn = ""
+
   depends_on      = [aws_ecr_repository.sqs-image]
 }
 
@@ -37,5 +40,6 @@ resource "aws_ecs_service" "sqs-service" {
     container_name   = "cp-task-send-sqs-container"
     container_port   = 5000
   }
+
   depends_on      = [aws_ecs_cluster.cluster, aws_ecs_task_definition.sqs-task, aws_lb_target_group.svc-tg, aws_lb.nlb]
 }
