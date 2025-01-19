@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://example.com/">
-    <img src="https://github.com/GolanSho/cp-task/blob/main/System_overview.png" alt="image" width=470 height=580>
+    <img src="https://github.com/GolanSho/cp-task/blob/main/System_Overview.png" alt="image" width=470 height=580>
   </a>
 
   <h3 align="center">Avanan Candidate Exam</h3>
