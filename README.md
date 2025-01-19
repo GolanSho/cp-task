@@ -70,7 +70,7 @@ Terraform:
 
 Jenkins Pipelines:
 - to run the pipelines you will need the plugins: Build With Parameters, Docker plugin, Docker Pipeline, Pipeline: AWS Steps.
-- the Docker cloud should be named 'Docker' and labeled 'Docker'
+- the Docker cloud should be named 'Docker' and labeled 'Docker', for the agent image, you should use the Dockerfile-agent.
 - make sure you have aws credentials with access and secret key.
 - create pipeline for each service with string parameter 'version' (default=latest), point the scm to the Jenkinsfile in the service folder.
 - run the pipelines.
