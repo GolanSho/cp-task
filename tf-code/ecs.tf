@@ -22,11 +22,7 @@ owners = ["amazon"]
 resource "aws_ecs_cluster" "cluster" {
   name               = "cp-task-ecs-cluster"
   capacity_providers = [aws_ecs_capacity_provider.ec2_provider.name]
-  # default_capacity_provider_strategy {
-  #   capacity_provider = aws_ecs_capacity_provider.ec2_provider.name
-  #   weight            = 1
-  #   base              = 0
-  # }
+
   setting {
     name  = "containerInsights"
     value = "enabled"

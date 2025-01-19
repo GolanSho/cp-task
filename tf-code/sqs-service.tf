@@ -24,8 +24,7 @@ resource "aws_ecs_task_definition" "sqs-task" {
       ]
     }
   ])
-  execution_role_arn = "arn:aws:iam::329599656414:role/ecsTaskExecutionRole" #aws_iam_role.ecs-execution-role.arn
-  #task_role_arn = ""
+  execution_role_arn = aws_iam_role.ecs-execution-role.arn
 
   depends_on      = [aws_ecr_repository.sqs-image]
 }

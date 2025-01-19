@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "s3-task" {
       ]
     }
   ])
-  execution_role_arn = "arn:aws:iam::329599656414:role/ecsTaskExecutionRole"
+  execution_role_arn = aws_iam_role.ecs-execution-role.arn
 
   depends_on      = [aws_ecr_repository.s3-image]
 }
